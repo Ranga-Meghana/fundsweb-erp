@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: fundsweb
+      POSTGRES_PASSWORD: fundsweb
+      POSTGRES_DB: fundsweb_erp
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "4000:4000"
+    environment:
+      DATABASE_URL: postgresql://fundsweb:fundsweb@db:5432/fundsweb_erp?schema=public
+      JWT_SECRET: replace-this-with-a-long-random-string
+      JWT_EXPIRES_IN: 8h
+      PORT: 4000
+      CORS_ORIGIN: http://localhost:5173
+
+volumes:
+  db_data:

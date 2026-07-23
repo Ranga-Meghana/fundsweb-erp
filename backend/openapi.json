@@ -1,0 +1,77 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Fundsweb Mini ERP + CRM API",
+    "version": "1.0.0",
+    "description": "Case study submission — auth, customer CRM, inventory, and sales challan modules."
+  },
+  "servers": [{ "url": "/" }],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
+    }
+  },
+  "security": [{ "bearerAuth": [] }],
+  "paths": {
+    "/auth/login": {
+      "post": {
+            "summary": "Log in and receive a JWT",
+            "security": [],
+            "requestBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "required": ["email", "password"],
+                            "properties": {
+                                "email": { "type": "string", "example": "admin@fundsweb.test" },
+                                "password": { "type": "string", "example": "password123" }
+                           }
+                        }
+                    }
+                }
+            },
+            "responses": {
+                "200": { "description": "Login successful" },
+                "401": { "description": "Invalid credentials" }
+            }
+        }
+    },
+    
+    "/customers": {
+      "get": { "summary": "List/search customers (paginated)", "responses": { "200": { "description": "OK" } } },
+      "post": { "summary": "Create a customer", "responses": { "201": { "description": "Created" } } }
+    },
+    "/customers/{id}": {
+      "get": { "summary": "Get customer detail with challan history", "responses": { "200": { "description": "OK" } } },
+      "put": { "summary": "Edit a customer", "responses": { "200": { "description": "OK" } } }
+    },
+    "/customers/{id}/notes": {
+      "post": { "summary": "Append a follow-up note", "responses": { "200": { "description": "OK" } } }
+    },
+    "/products": {
+      "get": { "summary": "List/search products, optional low-stock filter", "responses": { "200": { "description": "OK" } } },
+      "post": { "summary": "Create a product", "responses": { "201": { "description": "Created" } } }
+    },
+    "/products/{id}/stock-movement": {
+      "post": { "summary": "Record a stock IN/OUT movement", "responses": { "201": { "description": "Created" }, "400": { "description": "Insufficient stock" } } }
+    },
+    "/challans": {
+      "get": { "summary": "List challans, filter by status", "responses": { "200": { "description": "OK" } } },
+      "post": { "summary": "Create a draft challan", "responses": { "201": { "description": "Created" } } }
+    },
+    "/challans/{id}/confirm": {
+      "post": { "summary": "Confirm a challan (deducts stock atomically)", "responses": { "200": { "description": "Confirmed" }, "400": { "description": "Insufficient stock" } } }
+    },
+    "/challans/{id}/cancel": {
+      "post": { "summary": "Cancel a draft challan", "responses": { "200": { "description": "Cancelled" } } }
+    },
+    "/challans/{id}/invoice": {
+      "get": { "summary": "Download PDF invoice for a confirmed challan", "responses": { "200": { "description": "PDF file" } } }
+    },
+    "/dashboard/summary": {
+      "get": { "summary": "Key metrics: customers, products, low stock, challans, revenue", "responses": { "200": { "description": "OK" } } }
+    }
+  }
+}
